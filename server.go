@@ -5,10 +5,13 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/masudur-rahman/hackernews/graph"
+	hackernews "github.com/masudur-rahman/hackernews/graph/generated"
+	database "github.com/masudur-rahman/hackernews/internal/pkg/db/migrations/mysql"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/masudur-rahman/hackernews/graph"
-	"github.com/masudur-rahman/hackernews/graph/generated"
+	"github.com/go-chi/chi/v5"
 )
 
 const defaultPort = "8080"
@@ -19,11 +22,22 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	router := chi.NewRouter()
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	database.InitDB()
+	defer database.CloseDB()
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	server := handler.NewDefaultServer(
+		hackernews.NewExecutableSchema(
+			hackernews.Config{
+				Resolvers: &graph.Resolver{},
+			},
+		),
+	)
+
+	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	router.Handle("/query", server)
+
+	log.Printf("Connect to http://localhost:%s/ for GraphQL playground\n", port)
+	log.Fatalln(http.ListenAndServe(":"+port, router))
 }
