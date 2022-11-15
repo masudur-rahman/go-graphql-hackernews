@@ -10,7 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var DB *sql.DB
+var Db *sql.DB
 
 func InitDB() {
 	db, err := sql.Open("mysql", "root:dbpass@tcp(localhost)/hackernews")
@@ -22,19 +22,19 @@ func InitDB() {
 		log.Fatalln(err)
 	}
 
-	DB = db
+	Db = db
 }
 
 func CloseDB() error {
-	return DB.Close()
+	return Db.Close()
 }
 
 func Migrate() {
-	if err := DB.Ping(); err != nil {
+	if err := Db.Ping(); err != nil {
 		log.Fatalln(err)
 	}
 
-	driver, err := mysql.WithInstance(DB, &mysql.Config{})
+	driver, err := mysql.WithInstance(Db, &mysql.Config{})
 	if err != nil {
 		log.Fatalln(err)
 	}

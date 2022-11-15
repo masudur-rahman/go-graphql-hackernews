@@ -6,20 +6,27 @@ package graph
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/masudur-rahman/hackernews/graph/generated"
 	"github.com/masudur-rahman/hackernews/graph/model"
+	"github.com/masudur-rahman/hackernews/internal/links"
 )
 
 // CreateLink is the resolver for the createLink field.
 func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error) {
-	var link model.Link
-	var user model.User
-	link.Address = input.Address
+	var link links.Link
 	link.Title = input.Title
-	user.Name = "test"
-	link.User = &user
-	return &link, nil
+	link.Address = input.Address
+	linkID, err := link.Save()
+	if err != nil {
+		return nil, err
+	}
+	return &model.Link{
+		ID:      strconv.FormatInt(linkID, 10),
+		Title:   link.Title,
+		Address: link.Address,
+	}, nil
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -39,14 +46,30 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 
 // Links is the resolver for the links field.
 func (r *queryResolver) Links(ctx context.Context) ([]*model.Link, error) {
-	var links []*model.Link
-	dummyLink := model.Link{
-		Title:   "Our dummy link",
-		Address: "https://address.org",
-		User:    &model.User{Name: "admin"},
+	//var links []*model.Link
+	//dummyLink := model.Link{
+	//	Title:   "Our dummy link",
+	//	Address: "https://address.org",
+	//	User:    &model.User{Name: "admin"},
+	//}
+	//links = append(links, &dummyLink)
+	//return links, nil
+
+	var resultLinks []*model.Link
+	var dbLinks []links.Link
+	dbLinks, err := links.GetAll()
+	if err != nil {
+		return nil, err
 	}
-	links = append(links, &dummyLink)
-	return links, nil
+	for _, link := range dbLinks {
+		resultLinks = append(resultLinks, &model.Link{
+			ID:      link.ID,
+			Title:   link.Title,
+			Address: link.Address,
+		})
+	}
+
+	return resultLinks, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
