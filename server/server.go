@@ -7,6 +7,7 @@ import (
 
 	"github.com/masudur-rahman/hackernews/graph"
 	hackernews "github.com/masudur-rahman/hackernews/graph/generated"
+	"github.com/masudur-rahman/hackernews/internal/auth"
 	database "github.com/masudur-rahman/hackernews/internal/pkg/db/migrations/mysql"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -23,9 +24,11 @@ func main() {
 	}
 
 	router := chi.NewRouter()
+	router.Use(auth.MiddleWare())
 
 	database.InitDB()
 	defer database.CloseDB()
+	database.Migrate()
 
 	server := handler.NewDefaultServer(
 		hackernews.NewExecutableSchema(

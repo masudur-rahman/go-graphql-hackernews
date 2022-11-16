@@ -4,10 +4,12 @@ go 1.19
 
 require (
 	github.com/99designs/gqlgen v0.17.20
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/vektah/gqlparser/v2 v2.5.1
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 )
 
 require (
