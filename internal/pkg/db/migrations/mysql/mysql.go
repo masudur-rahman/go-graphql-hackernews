@@ -14,7 +14,7 @@ import (
 var Db *sql.DB
 
 func InitDB() {
-	db, err := sql.Open("mysql", "root:dbpass@tcp(localhost)/hackernews")
+	db, err := sql.Open("mysql", "root:mysql@tcp(localhost)/hackernews")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -42,7 +42,7 @@ func Migrate() {
 
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://internal/pkg/db/migrations/mysql",
-		"mysql",
+		"hackernews",
 		driver,
 	)
 	if err != nil {

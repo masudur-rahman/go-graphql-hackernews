@@ -262,29 +262,9 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../schema.graphqls", Input: `type Link {
-  id: ID!
-  title: String!
-  address: String!
-  user: User!
-}
-
-type User {
+	{Name: "../schema.graphqls", Input: `type User {
   id: ID!
   name: String!
-}
-
-type Query {
-  links: [Link!]!
-}
-
-input NewLink {
-  title: String!
-  address: String!
-}
-
-input RefreshTokenInput{
-  token: String!
 }
 
 input NewUser {
@@ -297,13 +277,34 @@ input Login {
   password: String!
 }
 
+input RefreshTokenInput{
+  token: String!
+}
+
+type Link {
+  id: ID!
+  title: String!
+  address: String!
+  user: User!
+}
+
+input NewLink {
+  title: String!
+  address: String!
+}
+
+type Query {
+  links: [Link!]!
+}
+
 type Mutation {
   createLink(input: NewLink!): Link!
   createUser(input: NewUser!): String!
   login(input: Login!): String!
-  # we'll talk about this in authentication section
+
   refreshToken(input: RefreshTokenInput!): String!
-}`, BuiltIn: false},
+}
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
