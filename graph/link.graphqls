@@ -1,0 +1,11 @@
+type Link {
+    id: ID!
+    title: String!
+    address: String!
+    user: User!
+}
+
+input NewLink {
+    title: String!
+    address: String!
+}
