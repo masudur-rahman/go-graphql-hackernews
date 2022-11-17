@@ -1,6 +1,8 @@
 package users
 
 import (
+	"database/sql"
+
 	database "github.com/masudur-rahman/hackernews/internal/pkg/db/migrations/mysql"
 
 	"golang.org/x/crypto/bcrypt"
@@ -28,6 +30,26 @@ func (user *User) Create() error {
 	}
 
 	return nil
+}
+
+func (user *User) Authenticate() (bool, error) {
+	statement, err := database.Db.Prepare("select password from Users where Username = ?")
+	if err != nil {
+		return false, err
+	}
+
+	row := statement.QueryRow(user.Username)
+
+	var hash string
+	err = row.Scan(&hash)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, err
+		}
+		return false, err
+
+	}
+	return CheckPasswordHash(user.Password, hash), nil
 }
 
 // HashPassword hashes given password
